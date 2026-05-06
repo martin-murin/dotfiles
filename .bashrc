@@ -96,6 +96,26 @@ if ! shopt -oq posix; then
   fi
 fi
 
+# fzf candidate generation: fast + avoids huge hidden dirs
+if command -v fd >/dev/null 2>&1; then
+  _FZF_FD=fd
+elif command -v fdfind >/dev/null 2>&1; then
+  _FZF_FD=fdfind
+fi
+
+if [ -n "${_FZF_FD:-}" ]; then
+  # Ctrl-T (files) + default fzf source
+  export FZF_DEFAULT_COMMAND="$_FZF_FD --type f --follow \
+    --exclude .git --exclude node_modules --exclude .venv --exclude .cache \
+    --exclude dist --exclude build --exclude target"
+  export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+
+  # Alt-C (directories)
+  export FZF_ALT_C_COMMAND="$_FZF_FD --type d --follow \
+    --exclude .git --exclude node_modules --exclude .venv --exclude .cache \
+    --exclude dist --exclude build --exclude target"
+fi
+
 # make less more friendly for non-text input files
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
@@ -111,6 +131,10 @@ export MANPAGER="vim -M +MANPAGER -"    # use vim to view man pages
 bind -m vi-command 'Control-l: clear-screen'
 bind -m vi-insert 'Control-l: clear-screen'
 
+########################################
+### ENVIRONMENT
+########################################
+[ -f ~/.env ] && source ~/.env
 
 ########################################
 ### ALIASES
@@ -185,6 +209,29 @@ ex ()
   fi
 }
 
+########################################
+### COPY TO CLIPBOARD
+########################################
+# usage: ctc <file>
+ctc() {
+  local _clip
+  if command -v wl-copy &>/dev/null && [ -n "$WAYLAND_DISPLAY" ]; then
+    _clip="wl-copy"
+  elif command -v xclip &>/dev/null; then
+    _clip="xclip -selection clipboard"
+  elif command -v xsel &>/dev/null; then
+    _clip="xsel --clipboard --input"
+  else
+    echo "ctc: no clipboard tool found (install wl-clipboard or xclip)" >&2
+    return 1
+  fi
+
+  if [ -t 0 ]; then
+    $_clip < "$1"
+  else
+    $_clip
+  fi
+}
 
 ########################################
 ### CONDA
@@ -203,3 +250,8 @@ else
 fi
 unset __conda_setup
 # <<< conda initialize <<<
+
+# FVM
+export PATH="/home/martin/.fvm_flutter/bin:$PATH"
+export PATH="$HOME/.npm-global/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
