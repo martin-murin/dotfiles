@@ -1,0 +1,55 @@
+format = "$git_branch$git_status$python$conda$username$hostname$directory$character"
+add_newline = false
+
+[line_break]
+disabled = true
+
+[directory]
+truncation_length = 3
+truncate_to_repo = false
+style = "bold bright-purple"
+home_symbol = "~"
+
+[username]
+show_always = true
+style_user = 'bold white'
+format = " [$user]($style)@"
+
+[hostname]
+ssh_only = false
+style = 'bold white'
+format = "[$hostname]($style) "
+
+[git_branch]
+symbol = ""
+style = "bright-blue"
+format = '\[[$symbol$branch]($style)\]'
+
+[git_commit]
+format = '\[[\($hash$tag\)]($style)\]'
+
+[git_metrics]
+format = '\[[+$added]($added_style)\]\[[-$deleted]($deleted_style)\]'
+
+[git_state]
+format = '\[[$state ($progress_current/$progress_total)]($style)\]'
+
+[git_status]
+format = '([\[$all_status$ahead_behind\]]($style))'
+
+[python]
+symbol = ""
+style = "yellow"
+format = '\[[${symbol}${pyenv_prefix}(${version})(\($virtualenv\))]($style)\]'
+
+[nodejs]
+symbol = "node "
+format = '\[[$symbol($version)]($style)\]'
+
+[conda]
+symbol = ""
+style = "green"
+ignore_base = false
+format = '\[[$symbol$environment]($style)\]'
+
+
